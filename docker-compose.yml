@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    container_name: azuresqledge
+    restart: always
+    cap_add:
+      - SYS_PTRACE
+    environment:
+      ACCEPT_EULA: "1"
+      MSSQL_SA_PASSWORD: "Giang@123"
+      MSSQL_PID: Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./.sql_data:/var/opt/mssql
