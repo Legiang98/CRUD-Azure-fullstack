@@ -1,83 +1,95 @@
 import * as pulumi from "@pulumi/pulumi";
-import * as azure from "@pulumi/azure-native";
-import { resourceGroup } from "../shared/resourceGroup";
+import * as azure_native from "@pulumi/azure-native";
 
-interface SubnetConfig {
+import { 
+    AzureResourceBase, 
+    SecurityRule, 
+    NetworkSecurityGroup, 
+    SubnetConfiguration 
+} from "./interfaces";
+
+export interface NetworkConfig extends AzureResourceBase {
     name: string;
-    addressPrefix: string;
-    nsgName: string;
-    nsgRules: azure.network.SecurityRuleArgs[];
-}
-
-interface NetworkConfig {
-    virtualNetworkName: string;
-    location: string;
-    vnetAddressSpace: string[];
-    subnetConfigs: SubnetConfig[];
+    addressSpace: string[];
+    nsgs: NetworkSecurityGroup[];
+    subnets: SubnetConfiguration[];
 }
 
 export class networkStack extends pulumi.ComponentResource {
     public readonly virtualNetworkId: pulumi.Output<string>;
-    public readonly nsgIds: { [subnetName: string]: pulumi.Output<string> };
+    public readonly virtualNetworkName: pulumi.Output<string>;
+    public readonly nsgIds: { [nsgName: string]: pulumi.Output<string> };
     public readonly subnetIds: { [subnetName: string]: pulumi.Output<string> };
 
-    constructor(name: string, config: NetworkConfig, opts?: pulumi.ResourceOptions) {
+    constructor(
+        name: string, 
+        config: NetworkConfig, 
+        opts?: pulumi.ResourceOptions
+    ) {
         super("custom:stack:networkStack", name, {}, opts);
 
-        const virtualNetwork = new azure.network.VirtualNetwork(
-            config.virtualNetworkName,
+        const virtualNetwork = new azure_native.network.VirtualNetwork(
+            `${name}`,
             {
-                resourceGroupName: resourceGroup.name,
+                resourceGroupName: config.resourceGroupName,
                 location: config.location,
-                addressSpace: { addressPrefixes: config.vnetAddressSpace },
+                addressSpace: {
+                    addressPrefixes: config.addressSpace
+                },
+                virtualNetworkName: config.name
             },
             { parent: this }
         );
 
-        const nsgs: { [key: string]: azure.network.NetworkSecurityGroup } = {};
-        const subnets: { [key: string]: azure.network.Subnet } = {};
-        
-        config.subnetConfigs.forEach((subnetConfig) => {
-            nsgs[subnetConfig.name] = new azure.network.NetworkSecurityGroup(
-                `${subnetConfig.nsgName}`,
+        const nsgs: { [key: string]: azure_native.network.NetworkSecurityGroup } = {};
+        config.nsgs.forEach((nsgConfig) => {
+            // ADD this for debugging
+            // console.log("Processing NSG Config:", nsgConfig.name);
+            // console.log("Security Rules:", nsgConfig.securityRules);
+
+            nsgs[nsgConfig.name] = new azure_native.network.NetworkSecurityGroup(
+                `${name}-${nsgConfig.name}`,
                 {
-                    networkSecurityGroupName: subnetConfig.nsgName,
-                    resourceGroupName: resourceGroup.name,
+                    resourceGroupName: config.resourceGroupName,
                     location: config.location,
-                    securityRules: subnetConfig.nsgRules,
+                    networkSecurityGroupName: nsgConfig.name,
+                    securityRules: nsgConfig.securityRules  
                 },
                 { parent: this }
             );
         });
 
-        config.subnetConfigs.forEach((subnetConfig) => {
-            subnets[subnetConfig.name] = new azure.network.Subnet(
-                `${subnetConfig.name}`,
+        const subnets: { [key: string]: azure_native.network.Subnet } = {};
+        config.subnets.forEach((subnetConfig) => {
+            subnets[subnetConfig.name] = new azure_native.network.Subnet(
+                `${name}-${subnetConfig.name}`,
                 {
-                    subnetName: subnetConfig.name,
-                    resourceGroupName: resourceGroup.name,
+                    resourceGroupName: config.resourceGroupName,
                     virtualNetworkName: virtualNetwork.name,
+                    subnetName: subnetConfig.name,
                     addressPrefix: subnetConfig.addressPrefix,
                     networkSecurityGroup: {
-                        id: nsgs[subnetConfig.name].id
+                        id: nsgs[subnetConfig.nsgName].id
                     }
                 },
                 { parent: this }
             );
         });
 
-        // Collect NSG IDs and Subnet IDs for output
+        this.virtualNetworkId = virtualNetwork.id;
+        this.virtualNetworkName = virtualNetwork.name;
         this.nsgIds = {};
+        config.nsgs.forEach((nsgConfig) => {
+            this.nsgIds[nsgConfig.name] = nsgs[nsgConfig.name].id;
+        });
         this.subnetIds = {};
-        config.subnetConfigs.forEach((subnetConfig) => {
-            this.nsgIds[subnetConfig.name] = nsgs[subnetConfig.name].id;
+        config.subnets.forEach((subnetConfig) => {
             this.subnetIds[subnetConfig.name] = subnets[subnetConfig.name].id;
         });
 
-        this.virtualNetworkId = virtualNetwork.id;
-
         this.registerOutputs({
             virtualNetworkId: this.virtualNetworkId,
+            virtualNetworkName: this.virtualNetworkName,
             nsgIds: this.nsgIds,
             subnetIds: this.subnetIds,
         });

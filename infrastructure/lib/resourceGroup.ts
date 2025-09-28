@@ -4,17 +4,15 @@ import * as azure from "@pulumi/azure-native";
 import { ResourceGroupConfig, resourceGroupStack } from "../stacks/shared/resourceGroup";
 
 const config = new pulumi.Config();
-const resourceGroupConfig = config.requireObject("resourceGroups") as Record<string, { location: string; name: string }>;
-const devResourceGroup = resourceGroupConfig.dev;
-
-// console.log("devresourcegroup", devresourcegroup);
+const devResourceGroup = config.requireObject("resourceGroups") as { name: string; location: string };
 
 const devRgConfig: ResourceGroupConfig = {
     resourceGroupName: devResourceGroup.name, 
     location: devResourceGroup.location,
     tags: {
-        environment: config.get("environment") || "dev",
-        project: config.get("project") || "my-project",
+        managedBy: "Pulumi",
+        project: "fullstack-crud",
+        environment: "dev",
     },
 };
 

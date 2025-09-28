@@ -4,6 +4,9 @@ config:
   resourceGroups:
     name: "iac-dev-rg"
     location: "southeastasia"
+    tags:
+      environment: "dev"
+      project: "fullstack-crud"
   virtualNetworks:
     name: "iac-dev-vnet"
     addressSpace: ["10.0.0.0/16"]
@@ -92,7 +95,7 @@ config:
     httpsOnly: true
     SiteConfig:
       # linuxFxVersion: "sitecontainers"
-      # linuxFxVersion: "DOKCER|mcr.microsoft.com/appsvc/staticsite:latest"
+      linuxFxVersion: "DOKCER|mcr.microsoft.com/appsvc/staticsite:latest"
       # linuxFxVersion: "sitecontainers|mcr.microsoft.com/appsvc/staticsite:latest"   
       # linuxFxVersion: "DOCKER|mcr.microsoft.com/appsvc/staticsite:latest"
     clientAffinityEnabled: false
