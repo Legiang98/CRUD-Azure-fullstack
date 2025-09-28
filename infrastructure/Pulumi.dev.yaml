@@ -1,0 +1,102 @@
+secretsprovider: azurekeyvault://giangiacdev.vault.azure.net/keys/payroll
+encryptedkey: S2dqOTNIQWl2SEttYjIxektTS2dkRVRjME1jX0RwQkUwVmYyajZsbkszMnZTdkhzNWUtbW9DeUdoVGFmV1F1VEMySXpHeGQ0Z0JHQ0dQTnhmYXdFdWxqeExWQ0pHRjFwRDZqT1U4NE44b2hfY29nZ2lpSmttb0praEQxaXNUMS14a2hhOUg3ckxWRGRJcC1RaVZyZWx2ZFVsWHNCaE9GdUJsT0dPZWdNckhUY1BUbUxZSXRrdlpza2hwMktBcnFFMGM4czdzOG1mMnY4MTF5Z2FPYjJPa2xKVURwdGxGWHhNYTZLWVhXX3pTNkpYR0phM1llal9mTkpwTTlQdmFFTEVQQmtNLWJCQ1U1SUR1Tkhldm1YR2xZUW1MbEwybGVKdjZNVnMxS0s4MzJ5dldNZDhSMHVKdlN4MjlGVFZydTE2T05Eb2hWU0dxTnlXY2dKNFhDc093
+config:
+  resourceGroups:
+    name: "iac-dev-rg"
+    location: "southeastasia"
+  virtualNetworks:
+    name: "iac-dev-vnet"
+    addressSpace: ["10.0.0.0/16"]
+    resourceGroupName: "iac-dev-rg"
+    location: "southeastasia"
+    nsgs:
+      - name: "iac-dev-backend-nsg"
+        securityRules:
+          - name: "AllowHTTP"
+            priority: 1001
+            direction: "Inbound"
+            access: "Allow"
+            protocol: "Tcp"
+            sourcePortRange: "*"
+            destinationPortRange: "80"
+            sourceAddressPrefix: "*"
+            destinationAddressPrefix: "*"
+          - name: "AllowHTTPS"
+            priority: 1002
+            direction: "Inbound"
+            access: "Allow"
+            protocol: "Tcp"
+            sourcePortRange: "*"
+            destinationPortRange: "443"
+            sourceAddressPrefix: "*"
+            destinationAddressPrefix: "*"
+      - name: "iac-dev-frontend-nsg"
+        securityRules:
+          - name: "AllowHTTP"
+            priority: 1001
+            direction: "Inbound"
+            access: "Allow"
+            protocol: "Tcp"
+            sourcePortRange: "*"
+            destinationPortRange: "80"
+            sourceAddressPrefix: "*"
+            destinationAddressPrefix: "*"
+          - name: "AllowHTTPS"
+            priority: 1002
+            direction: "Inbound"
+            access: "Allow"
+            protocol: "Tcp"
+            sourcePortRange: "*"
+            destinationPortRange: "443"
+            sourceAddressPrefix: "*"
+            destinationAddressPrefix: "*"
+      - name: "iac-dev-database-nsg"
+        securityRules:
+          - name: "AllowSQL"
+            priority: 1001
+            direction: "Inbound"
+            access: "Allow"
+            protocol: "Tcp"
+            sourcePortRange: "*"
+            destinationPortRange: "1433"
+            sourceAddressPrefix: "10.0.0.0/16"
+            destinationAddressPrefix: "*"
+    subnets:
+      - name: "iac-dev-backend-subnet"
+        addressPrefix: "10.0.1.0/24"
+        nsgName: "iac-dev-backend-nsg"
+      - name: "iac-dev-frontend-subnet"
+        addressPrefix: "10.0.2.0/24"
+        nsgName: "iac-dev-frontend-nsg"
+      - name: "iac-dev-database-subnet"
+        addressPrefix: "10.0.3.0/24"
+        nsgName: "iac-dev-database-nsg"
+  appServiceIac:
+    appServiceName: "appserivcedev01"
+    appServicePlanName: "appserviceplaniac"
+    kind: "app,linux,container"
+    resourceGroupName: "Fullstack"
+    location: "southeastasia"
+    appServicePlanConfig:
+      appServicePlanName: "appserviceplaniac"
+      kind: "app,linux,container"
+      reserved: true
+      sku:
+        name: "P0v4"
+        tier: "PremiumV4"
+        size: "P0v4"
+        family: "Pv4"
+        capacity: 1
+      targetWorkerCount: 0
+      targetWorkerSizeId: 0
+    httpsOnly: true
+    SiteConfig:
+      # linuxFxVersion: "sitecontainers"
+      # linuxFxVersion: "DOKCER|mcr.microsoft.com/appsvc/staticsite:latest"
+      # linuxFxVersion: "sitecontainers|mcr.microsoft.com/appsvc/staticsite:latest"   
+      # linuxFxVersion: "DOCKER|mcr.microsoft.com/appsvc/staticsite:latest"
+    clientAffinityEnabled: false
+    tags:
+      environment: "dev"
+      project: "fullstack-crud"
+      tier: "backend"
