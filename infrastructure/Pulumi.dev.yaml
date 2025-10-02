@@ -85,10 +85,10 @@ config:
       kind: "app,linux,container"
       reserved: true
       sku:
-        name: "P0v4"
-        tier: "PremiumV4"
-        size: "P0v4"
-        family: "Pv4"
+        name: "B1"
+        tier: "Basic"
+        size: "B1"
+        family: "B"
         capacity: 1
       targetWorkerCount: 0
       targetWorkerSizeId: 0
@@ -103,3 +103,9 @@ config:
       environment: "dev"
       project: "fullstack-crud"
       tier: "backend"
+  database:
+    sqlServerName: "sqlserverdev01"
+    administratorLogin: "platformadmin"
+    administratorLoginPassword: "Giang@123"
+    resourceGroupName: "iac-dev-rg"
+    location: "southeastasia"

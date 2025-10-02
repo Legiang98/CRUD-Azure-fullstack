@@ -1,76 +1,144 @@
 import { User } from "../models/user.model.js";
-import { USER_MESSAGES } from "../constants/messages.js";
+import { 
+  createUserValidator,
+  updateUserValidator,
+  deleteUserValidator,
+  getUserByIdValidator,
+  getListUserValidator,
+} from "../validators/user.validator.js";
+import { StatusCodes } from "http-status-codes";
+import { ErrorHelper } from "../utils/errorHelper.js";
 
-export async function getUserProfile(req, res) {
+export const getAllUsers = async (req, res) => {
   try {
-    const userId = req.userId; // Assume req.userId is set by verifyToken middleware
-    const user = await User.findByPk(userId, {
-      attributes: { exclude: ['password'] } // Exclude password field
-    });
-    if (!user) {
-      return res.status(404).json({ message: USER_MESSAGES.USER_NOT_FOUND });
+    const { error } = getListUserValidator.validate(req.query);
+    if (error) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: error.details[0].message });
     }
-    res.status(200).json(user);
-  } catch (error) {
-    console.error("Get user profile error:", error);
-    res.status(500).json({ 
-      message: USER_MESSAGES.ERROR_GETTING_USER_PROFILE, 
-      error: error.message 
+    
+    const users = await User.findAll();
+    if (!users || users.length === 0) {
+      const code = "0002";
+      return res.status(StatusCodes.NOT_FOUND).json(
+        ErrorHelper(code)
+      );
+    }
+    
+    return res.status(StatusCodes.OK).json({ 
+      code: "0000", 
+      data: users,
+      count: users.length 
     });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
+      ErrorHelper("5000", error.message)
+    );
   }
-}
+};
 
-export async function updateUser(req, res) {
+export const getUserById = async (req, res) => {
   try {
-    const userId = req.userId; // Assume req.userId is set by verifyToken middleware
-    const { username, email } = req.body;
-    const user = await User.findByPk(userId);
-    if (!user) {
-      return res.status(404).json({ message: USER_MESSAGES.USER_NOT_FOUND });
+    const { error } = getUserByIdValidator.validate(req.params);
+    if (error) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: error.details[0].message });
     }
-    // Update fields
-    if (username) user.username = username;
-    if (email) user.email = email;
-    await user.save();
-    res.status(200).json({ message: USER_MESSAGES.USER_UPDATED_SUCCESS });
+    
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+      const code = "0001";
+      return res.status(StatusCodes.NOT_FOUND).json(
+        ErrorHelper(code)
+      );
+    }
+    
+    return res.status(StatusCodes.OK).json({ 
+      code: "0000", 
+      data: user 
+    });
   } catch (error) {
-    console.error("Update user error:", error);
-    res.status(500).json({ 
-      message: USER_MESSAGES.ERROR_UPDATING_USER, 
-      error: error.message 
-    });
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
+      ErrorHelper("5000", error.message)
+    );
   }
-}
+};
 
-export async function getAllUsers(req, res) {
-  try { 
-    const users = await User.findAll({
-      attributes: { exclude: ['password'] } // Exclude password field
-    });
-    res.status(200).json(users);
-  } catch (error) {
-    console.error("Get all users error:", error);
-    res.status(500).json({ 
-      message: USER_MESSAGES.ERROR_GETTING_USERS, 
-      error: error.message 
-    });
-  }
-}
-
-export async function deleteUser(req, res) {
+export const createUser = async (req, res) => {
   try {
-    const userId = req.params.id;
-    const user = await User.findByPk(userId);
-    if (!user) {
-      return res.status(404).json({ message: USER_MESSAGES.USER_NOT_FOUND });
+    const { error } = createUserValidator.validate(req.body);
+    if (error) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: error.details[0].message });
     }
+
+    const user = await User.create(req.body);
+    
+    return res.status(StatusCodes.CREATED).json({ 
+      code: "0000", 
+      data: user 
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
+      ErrorHelper("5000", error.message)
+    );
+  }
+};
+
+export const updateUser = async (req, res) => {
+  try {
+    const { error: paramError } = getUserByIdValidator.validate(req.params);
+    if (paramError) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: paramError.details[0].message });
+    }
+
+    const { error: bodyError } = updateUserValidator.validate(req.body);
+    if (bodyError) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: bodyError.details[0].message });
+    }
+
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+      const code = "0001";
+      return res.status(StatusCodes.NOT_FOUND).json(
+        ErrorHelper(code)
+      );
+    }
+
+    await user.update(req.body);
+    
+    return res.status(StatusCodes.OK).json({ 
+      code: "0000", 
+      data: user 
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
+      ErrorHelper("5000", error.message)
+    );
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    const { error } = deleteUserValidator.validate(req.params);
+    if (error) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: error.details[0].message });
+    }
+
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+      const code = "0001";
+      return res.status(StatusCodes.NOT_FOUND).json(
+        ErrorHelper(code)
+      );
+    }
+
     await user.destroy();
-    res.status(200).json({ message: USER_MESSAGES.USER_DELETED_SUCCESS });
-  } catch (error) {
-    console.error("Delete user error:", error);
-    res.status(500).json({ 
-      message: USER_MESSAGES.ERROR_DELETING_USER, 
-      error: error.message 
+    
+    return res.status(StatusCodes.OK).json({ 
+      code: "0000", 
+      message: "User deleted successfully" 
     });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
+      ErrorHelper("5000", error.message)
+    );
   }
-}
+};

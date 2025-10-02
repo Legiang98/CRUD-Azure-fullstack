@@ -2,7 +2,7 @@
 import { sequelize } from "../db/pool.js";
 import bcrypt from "bcryptjs";
 import { Sequelize, DataTypes } from "sequelize";
-import { MODEL_MESSAGES } from "../constants/messages.js";
+// import { MODEL_MESSAGES } from "../constants/messages.js";
 
 export const User = sequelize.define(
   "User",
@@ -33,6 +33,4 @@ export const User = sequelize.define(
   }
 );
 
-await User.sync(); // Ensure the model is synced with the database
-console.log(MODEL_MESSAGES.USER_MODEL_SYNCED);
-
+await User.sync({ force : true }); 

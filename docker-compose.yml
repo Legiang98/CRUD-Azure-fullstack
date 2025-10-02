@@ -1,6 +1,6 @@
 services:
   db:
-    image: mcr.microsoft.com/azure-sql-edge:latest
+    image: sqlserver
     container_name: azuresqledge
     restart: always
     cap_add:

@@ -24,6 +24,5 @@ const sequelize = new Sequelize(
 //   console.log(result[0]);
 // } catch (err) {
 //   console.error("Database Connection Failed! Bad Config: ", err);
-// }
 
 export { sequelize };
