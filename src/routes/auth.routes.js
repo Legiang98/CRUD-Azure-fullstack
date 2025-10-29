@@ -1,18 +1,35 @@
-// Auth routes
-import { Router } from 'express';
-import { register, login, logout } from '../controllers/auth.controller.js';
-import { validateRegister, validateLogin } from '../validators/auth.validator.js';
-import { checkDuplicateUsernameOrEmail } from '../middlewares/index.js';
+import express from 'express';
+import { 
+  getAllUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser
+} from '../controllers/user.controller.js';
+import {
+  getAllRoles,
+  getRoleById,
+  createRole,
+  updateRole,
+  deleteRole
+} from '../controllers/role.controller.js';
 
-const router = Router();
+const authRoute = express.Router();
 
-router.post('/register', [
-  validateRegister,
-  checkDuplicateUsernameOrEmail
-], register);
+authRoute.use(express.json());
 
-router.post('/login', validateLogin, login);
+// User routes
+authRoute.get('/users', getAllUsers);           // GET all users
+authRoute.get('/users/:id', getUserById);       // GET user by ID
+authRoute.post('/user', createUser);           // CREATE new user
+authRoute.put('/users/:id', updateUser);        // UPDATE user by ID
+authRoute.delete('/users/:id', deleteUser);     // DELETE user by ID
 
-router.post('/logout', logout);
+// Role routes
+authRoute.get('/roles', getAllRoles);           // GET all roles
+authRoute.get('/roles/:id', getRoleById);       // GET role by ID
+authRoute.post('/roles', createRole);           // CREATE new role
+authRoute.put('/roles/:id', updateRole);        // UPDATE role by ID
+authRoute.delete('/roles/:id', deleteRole);     // DELETE role by ID
 
-export default router;
+export default authRoute;

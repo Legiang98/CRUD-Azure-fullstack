@@ -1,7 +1,6 @@
 // Role model
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db/pool.js";
-import { MODEL_MESSAGES } from "../constants/messages.js";
 
 const Role = sequelize.define(
   "Role",
@@ -24,6 +23,5 @@ const Role = sequelize.define(
 );
 
 await Role.sync(); // Ensure the model is synced with the database
-console.log(MODEL_MESSAGES.ROLE_MODEL_SYNCED);
 
 export { Role };

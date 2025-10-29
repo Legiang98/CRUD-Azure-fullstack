@@ -1,5 +1,3 @@
-// Centralized route exports
-import authRoutes from "./auth.routes.js";
-import userRoutes from "./user.routes.js";
+import authRoute from './auth.routes.js';
 
-export { authRoutes, userRoutes };
+export { authRoute };

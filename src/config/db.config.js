@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 
-dotenv.config({ path: "../../.env" });
+dotenv.config();
 
 export const dbConfig = {
   user: process.env.DB_USER,

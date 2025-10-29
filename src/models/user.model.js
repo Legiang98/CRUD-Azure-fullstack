@@ -2,7 +2,6 @@
 import { sequelize } from "../db/pool.js";
 import bcrypt from "bcryptjs";
 import { Sequelize, DataTypes } from "sequelize";
-// import { MODEL_MESSAGES } from "../constants/messages.js";
 
 export const User = sequelize.define(
   "User",
@@ -33,4 +32,4 @@ export const User = sequelize.define(
   }
 );
 
-await User.sync({ force : true }); 
+await User.sync(); // Only creates table if it doesn't exist, preserves data

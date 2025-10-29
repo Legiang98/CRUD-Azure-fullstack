@@ -59,7 +59,7 @@ export const getUserById = async (req, res) => {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
       ErrorHelper("5000", error.message)
     );
-  }
+}
 };
 
 export const createUser = async (req, res) => {
