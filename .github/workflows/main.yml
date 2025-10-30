@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  ACR_NAME: giangpublicacr01           
+  ACR_NAME: giangiacdevacr01           
   IMAGE_NAME: fullstack-backend        
   IMAGE_TAG: latest      
 
@@ -28,7 +28,7 @@ jobs:
           acrPassword: ${{ secrets.ACR_PASSWORD }}
         run: |
           echo "Logging into Azure Container Registry: $ACR_NAME"
-          docker login "$ACR_NAME.azurecr.io" --username "$acrUsername" --password "$acrPassword"
+          echo "$acrPassword" | docker login "$ACR_NAME.azurecr.io" --username "$acrUsername" --password-stdin
 
       - name: Build Docker image
         run: |
