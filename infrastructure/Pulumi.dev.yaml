@@ -104,8 +104,22 @@ config:
       project: "fullstack-crud"
       tier: "backend"
   database:
-    sqlServerName: "sqlserverdev01"
-    administratorLogin: "platformadmin"
-    administratorLoginPassword: "Giang@123"
+    serverName: "giangsqlserverdev01"
+    databaseName: "sqldevdb01"
+    administratorLogin: "platformadmin" # only for dev, will update this later with encrypted value from key vault
+    administratorLoginPassword: "Giang@123" # only for dev, will update this later with encrypted value from key vault
     resourceGroupName: "iac-dev-rg"
     location: "southeastasia"
+    sku:
+      name: "S0"
+      tier: "Standard"
+  keyvault:
+    resourceGroupName: "iac-dev-rg"
+    location: "southeastasia"
+    vaultName: "giangbackenddev"
+    tenantId: "5e158e2a-0596-4a6c-8801-3502aef4563f"
+  acr:
+    registryName: "giangiacdevacr01"
+    resourceGroupName: "iac-dev-rg"
+    location: "southeastasia"
+    sku: "Basic"

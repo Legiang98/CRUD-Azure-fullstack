@@ -11,3 +11,4 @@ const config = new pulumi.Config();
 
 const appServiceConfigParams = config.requireObject("appServiceIac") as AppServiceConfig;
 export const devAppService = new appServiceStack("appServiceIac", appServiceConfigParams);
+export const SystemAssignedIdentityPricipalId = devAppService.SystemAssignedIdentityPricipalId;

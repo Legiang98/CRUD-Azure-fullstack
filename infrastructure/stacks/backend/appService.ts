@@ -35,6 +35,7 @@ export class appServiceStack extends pulumi.ComponentResource {
     public readonly appServiceId: pulumi.Output<string>;
     public readonly appServiceName: pulumi.Output<string>;
     public readonly defaultHostName: pulumi.Output<string>;
+    public readonly SystemAssignedIdentityPricipalId: pulumi.Output<string>;
 
     constructor(
         name: string,
@@ -70,6 +71,9 @@ export class appServiceStack extends pulumi.ComponentResource {
                 // appSettings: config.appSettings,
                 httpsOnly: config.httpsOnly ?? true,
                 clientAffinityEnabled: config.clientAffinityEnabled ?? false,
+                identity: {
+                    type: azure_native.web.ManagedServiceIdentityType.SystemAssigned,
+                },
                 tags: config.tags,
                 name: config.appServiceName,
             },
@@ -82,12 +86,14 @@ export class appServiceStack extends pulumi.ComponentResource {
         this.appServiceId = appService.id;
         this.appServiceName = appService.name;
         this.defaultHostName = appService.defaultHostName;
+        this.SystemAssignedIdentityPricipalId = appService.identity.apply(id => id?.principalId!);
 
         this.registerOutputs({
             appServicePlanId: this.appServicePlanId,
             appServiceId: this.appServiceId,
             appServiceName: this.appServiceName,
             defaultHostName: this.defaultHostName,
+            SystemAssignedIdentityPricipalId: this.SystemAssignedIdentityPricipalId,
         });
     }
 }
