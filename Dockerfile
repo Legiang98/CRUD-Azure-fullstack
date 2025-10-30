@@ -7,7 +7,6 @@ COPY package*.json ./
 RUN npm ci && npm cache clean --force
 
 COPY src /app/src
-COPY .env /app/.env
 COPY server.js /app/server.js
 EXPOSE 3000
 
