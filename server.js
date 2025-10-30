@@ -1,16 +1,17 @@
 import express from "express";
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+
+dotenv.config();
 //import { cookieValidator } from "./src/validators/cookies.validator.js";
-import { authRoutes, userRoutes } from "./src/routes/index.js";
+import { authRoute } from "./src/routes/index.js";
 
 const app = express();
 
 app.use(express.json());
 
-// Routers
-app.use("/", authRoutes);
-app.use("/", userRoutes);
+app.use("/auth", authRoute);
 
 // Start the server
-app.listen(3000);
-console.log("Server is running on port 3000");
+app.listen(process.env.BE_PORT);
+console.log(`Server is running on port ${process.env.BE_PORT}`);

@@ -1,15 +1,19 @@
 services:
-  db:
-    image: sqlserver
-    container_name: azuresqledge
-    restart: always
-    cap_add:
-      - SYS_PTRACE
-    environment:
-      ACCEPT_EULA: "1"
-      MSSQL_SA_PASSWORD: "Giang@123"
-      MSSQL_PID: Developer
+  backend:
+    build: .
+    container_name: fullstack-backend
     ports:
-      - "1433:1433"
-    volumes:
-      - ./.sql_data:/var/opt/mssql
+      - "3000:3000"
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+      BE_PORT: ${BE_PORT}
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge
