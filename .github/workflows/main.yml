@@ -10,7 +10,7 @@ on:
 env:
   ACR_NAME: giangpublicacr01           
   IMAGE_NAME: fullstack-backend        
-  IMAGE_TAG: latest                    
+  IMAGE_TAG: latest      
 
 jobs:
   build-and-push:
@@ -22,9 +22,10 @@ jobs:
 
       - name: Azure Container Registry login
         shell: bash
+
         env: 
-          acrUsername: ${{ secrets.ACR_USERNAME }}
-          acrPassword: ${{ secrets.ACR_PASSWORD }}
+          acrUsername: ${{ vars.ACR_USERNAME }}
+          acrPassword: ${{ vars.ACR_PASSWORD }}
         run: |
           echo "Logging into Azure Container Registry: $ACR_NAME"
           docker login "$ACR_NAME.azurecr.io" --username "$acrUsername" --password "$acrPassword"
