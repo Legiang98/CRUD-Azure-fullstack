@@ -15,7 +15,7 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
+    environment: DEV
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,8 +24,8 @@ jobs:
         shell: bash
 
         env: 
-          acrUsername: ${{ vars.ACR_USERNAME }}
-          acrPassword: ${{ vars.ACR_PASSWORD }}
+          acrUsername: ${{ secrets.ACR_USERNAME }}
+          acrPassword: ${{ secrets.ACR_PASSWORD }}
         run: |
           echo "Logging into Azure Container Registry: $ACR_NAME"
           docker login "$ACR_NAME.azurecr.io" --username "$acrUsername" --password "$acrPassword"
