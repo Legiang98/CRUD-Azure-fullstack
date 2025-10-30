@@ -23,10 +23,11 @@ jobs:
       - name: Azure Container Registry login
         shell: bash
         env: 
-          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
-          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+          acrUsername: ${{ secrets.ACR_USERNAME }}
+          acrPassword: ${{ secrets.ACR_PASSWORD }}
         run: |
-          docker login $ACR_NAME.azurecr.io --username "$ACR_USERNAME" --password "$ACR_PASSWORD"
+          echo "Logging into Azure Container Registry: $ACR_NAME"
+          docker login "$ACR_NAME.azurecr.io" --username "$acrUsername" --password "$acrPassword"
 
       - name: Build Docker image
         run: |
