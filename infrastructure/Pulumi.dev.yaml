@@ -94,10 +94,8 @@ config:
       targetWorkerSizeId: 0
     httpsOnly: true
     SiteConfig:
-      # linuxFxVersion: "sitecontainers"
-      linuxFxVersion: "DOKCER|mcr.microsoft.com/appsvc/staticsite:latest"
-      # linuxFxVersion: "sitecontainers|mcr.microsoft.com/appsvc/staticsite:latest"   
-      # linuxFxVersion: "DOCKER|mcr.microsoft.com/appsvc/staticsite:latest"
+      acrUseManagedIdentityCreds: false
+      linuxFxVersion: "DOCKER|giangiacdevacr01.azurecr.io/fullstack-backend:latest"
     clientAffinityEnabled: false
     tags:
       environment: "dev"
